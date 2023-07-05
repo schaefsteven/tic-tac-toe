@@ -1,0 +1,12 @@
+.board-wrapper { 
+    width: 312px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border: 2px solid blue;
+}
+
+.board-cell { 
+    border: 2px solid blue;
+    height: 100px;
+    width: 100px;
+}
