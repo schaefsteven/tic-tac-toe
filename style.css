@@ -9,4 +9,15 @@
     border: 2px solid blue;
     height: 100px;
     width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5rem;
+    user-select: none;
+}
+
+#turn-indicator { 
+    display: block;
+    margin-top: 1rem;
+    font-size: 2rem;
 }
