@@ -17,10 +17,7 @@ class Cell {
         this.value = this.game.currentPlayer
         this.updateDisplay()
         this.game.togglePlayer()
-        const winner = this.game.checkWin()
-        if (winner) { 
-            this.game.declareWinner(winner)
-        }
+        this.game.checkWin()
     }
 
     updateDisplay() {
@@ -33,9 +30,24 @@ class Game {
         this.cells = []
         const allCells = document.querySelectorAll(".board-cell")
         allCells.forEach( div => this.cells.push(new Cell(div, this)) )
-        this.currentPlayer = 'X'
         this.turnIndicator = document.querySelector("#turn-indicator")
+        this.resetGame()
+    }
+    
+    resetGame() {
+        for (const cell of this.cells) {
+            cell.value = ""
+        }
+        this.updateAllCells()
         this.completed = false
+        this.currentPlayer = 'X'
+        this.turnIndicator.innerText = "X goes first!"
+    }
+    
+    updateAllCells() {
+        for (const cell of this.cells) {
+            cell.updateDisplay()
+        }
     }
     
     togglePlayer() {
@@ -66,7 +78,8 @@ class Game {
                 }
             }
             if (win) {
-                return value
+                this.declareWinner(value)
+                return
             }
         }
 
@@ -87,7 +100,8 @@ class Game {
                 }
             }
             if (win) {
-                return value
+                this.declareWinner(value)
+                return
             }
         }
         
@@ -108,7 +122,8 @@ class Game {
             }
         }
         if (win) {
-            return value
+            this.declareWinner(value)
+            return
         }
 
         start = sideLength - 1
@@ -127,11 +142,23 @@ class Game {
             }
         }
         if (win) {
-            return value
+            this.declareWinner(value)
+            return
         }
 
-        //If no win is detected, return false
-        return false
+        //Check for tie 
+        let tie = true
+        for (const cell of this.cells) {
+            if (cell.value == "") {
+                tie = false
+                break
+            }
+        }
+        if (tie) {
+            this.declareTie()
+            return
+        }
+
     }
 
     declareWinner(winner) {
@@ -139,7 +166,15 @@ class Game {
         this.turnIndicator.innerText = `${winner} wins!`
     }
 
+    declareTie() {
+        this.completed = true
+        this.turnIndicator.innerText = "Tie!"
+    }
+
 }
 
-
 let theGame = new Game()
+
+document.querySelector("#new-game").addEventListener(
+    "click", () => theGame.resetGame()
+)
