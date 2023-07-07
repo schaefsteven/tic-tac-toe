@@ -1,10 +1,9 @@
 class Cell {
     constructor(div, game) {
         this.div = div
-        this.div.parent = this
         this.div.addEventListener("click", this.cellClick.bind(this))
         this.value = ""
-        this.game = game
+        this.game = game // This is the parent Game element
     }
 
     cellClick() {
@@ -16,8 +15,7 @@ class Cell {
         }
         this.value = this.game.currentPlayer
         this.updateDisplay()
-        this.game.togglePlayer()
-        this.game.checkWin()
+        this.game.onCellClick()
     }
 
     updateDisplay() {
@@ -30,8 +28,19 @@ class Game {
         this.cells = []
         const allCells = document.querySelectorAll(".board-cell")
         allCells.forEach( div => this.cells.push(new Cell(div, this)) )
-        this.turnIndicator = document.querySelector("#turn-indicator")
+        this.statusLine = document.querySelector("#turn-indicator")
         this.resetGame()
+    }
+
+    onCellClick() {
+        this.togglePlayer()
+        const gameStatus = this.checkWin()
+        if (gameStatus == 'tie') {
+            this.declareTie()
+        }
+        else if (gameStatus) { 
+            this.declareWinner(gameStatus)
+        }
     }
     
     resetGame() {
@@ -41,7 +50,7 @@ class Game {
         this.updateAllCells()
         this.completed = false
         this.currentPlayer = 'X'
-        this.turnIndicator.innerText = "X goes first!"
+        this.statusLine.innerText = "X goes first!"
     }
     
     updateAllCells() {
@@ -57,10 +66,12 @@ class Game {
         else {
             this.currentPlayer = 'X'
         }
-        this.turnIndicator.innerText = `${this.currentPlayer}'s turn!`
+        this.statusLine.innerText = `${this.currentPlayer}'s turn!`
     }
 
     checkWin() {
+        // Checks for a win or a tie of the game. Returns the winning player, 
+        // string "tie" or false if the game is not over.
         const sideLength = 3
 
         //Check Rows
@@ -78,8 +89,7 @@ class Game {
                 }
             }
             if (win) {
-                this.declareWinner(value)
-                return
+                return value
             }
         }
 
@@ -100,8 +110,7 @@ class Game {
                 }
             }
             if (win) {
-                this.declareWinner(value)
-                return
+                return value
             }
         }
         
@@ -122,8 +131,7 @@ class Game {
             }
         }
         if (win) {
-            this.declareWinner(value)
-            return
+            return value
         }
 
         start = sideLength - 1
@@ -142,8 +150,7 @@ class Game {
             }
         }
         if (win) {
-            this.declareWinner(value)
-            return
+            return value
         }
 
         //Check for tie 
@@ -155,20 +162,21 @@ class Game {
             }
         }
         if (tie) {
-            this.declareTie()
-            return
+            return 'tie'
         }
+
+    return false
 
     }
 
     declareWinner(winner) {
         this.completed = true
-        this.turnIndicator.innerText = `${winner} wins!`
+        this.statusLine.innerText = `${winner} wins!`
     }
 
     declareTie() {
         this.completed = true
-        this.turnIndicator.innerText = "Tie!"
+        this.statusLine.innerText = "Tie!"
     }
 
 }
